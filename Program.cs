@@ -15,6 +15,9 @@ internal static class Program
         Field f = new Field();
         while (!Raylib.WindowShouldClose())
         {
+
+            f.Manipulator.InputProcessing();
+
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.White);
 

@@ -44,4 +44,14 @@ public static class DirectionHelper
             _ => throw new System.NotImplementedException(),
         };
     }
+
+    public static Direction RotateClockwise(this Direction dir)
+    {
+        return (Direction)(((int)dir + 1) & 0x7);
+    }
+
+    public static Direction RotateAnticlockwise(this Direction dir)
+    {
+        return (Direction)(((int)dir + 7) & 0x7);
+    }
 }

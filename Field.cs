@@ -11,10 +11,10 @@ public class Field
 
     public int CellSize { get; init; } = 40;
 
-    public Manipulator manipulator;
+    public Manipulator Manipulator;
     public Field()
     {
-        manipulator = new Manipulator(){X = 4, Y = 4};
+        Manipulator = new Manipulator(){X = 4, Y = 4};
     }
 
     public void GridDraw()
@@ -22,11 +22,11 @@ public class Field
         int max = CellSize * Size + 1;
         for (int i = 0; i < Size + 1; i++)
         {
-            int t = CellSize * (i) + 1;
+            int t = CellSize * i + 1;
             Raylib.DrawLine(0, t, max, t, Color.Red);
             Raylib.DrawLine(t, 0, t, max, Color.Red);
         }
 
-        manipulator.Draw(CellSize);
+        Manipulator.Draw(CellSize);
     }
 }
