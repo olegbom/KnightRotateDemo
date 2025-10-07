@@ -1,7 +1,4 @@
 ﻿using Raylib_cs;
-using System;
-using System.IO;
-using System.Collections.Generic;
 
 namespace KnightRotateDemo;
 
@@ -12,10 +9,9 @@ internal static class Program
     public static void Main()
     {
         Raylib.InitWindow(800, 480, "Hello World");
-        Field f = new Field();
+        Field f = new();
         while (!Raylib.WindowShouldClose())
         {
-
             f.Manipulator.InputProcessing();
 
             Raylib.BeginDrawing();

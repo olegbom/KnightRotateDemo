@@ -8,7 +8,8 @@ public class Manipulator
     public int X { get; set; }
     public int Y { get; set; }
     public Direction Direction { get; set;} = Direction.One;
-    // public bool Is
+    public bool IsGrabbed {get;set;} = false;
+
     public Manipulator()
     {
 
@@ -25,6 +26,11 @@ public class Manipulator
         {
             Direction = Direction.RotateClockwise();
         }
+
+        if( Raylib.IsKeyPressed(KeyboardKey.R) )
+        {
+            IsGrabbed = !IsGrabbed;
+        }
     }
 
     public void Draw(int cellSize)
@@ -38,7 +44,9 @@ public class Manipulator
         Raylib.DrawCircleLinesV(
             new Vector2(
                 cellSize * (X + Direction.DeltaX() + 0.5f) + 1,
-                cellSize * (Y + Direction.DeltaY() + 0.5f) + 1),
-            (int)(cellSize * 0.4), Color.DarkBlue);
+                cellSize * (Y + Direction.DeltaY() + 0.5f) + 1
+            ),
+            cellSize * (IsGrabbed ? 0.4f : 0.45f),
+            IsGrabbed ? Color.Blue : Color.DarkBlue);
     }
 }
