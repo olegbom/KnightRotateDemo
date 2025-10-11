@@ -10,7 +10,7 @@ const exports = await getAssemblyExports(config.mainAssemblyName);
 dotnet.instance.Module['canvas'] = document.getElementById('canvas');
 
 function mainLoop() {
-    exports.RaylibWasm.Application.UpdateFrame();
+    exports.KnightRotateDemo.Application.UpdateFrame();
 
     window.requestAnimationFrame(mainLoop);
 }

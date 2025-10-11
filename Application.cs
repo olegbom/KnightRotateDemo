@@ -3,25 +3,26 @@ using System.Runtime.InteropServices.JavaScript;
 
 namespace KnightRotateDemo;
 
-internal static class Program
+public partial class Application
 {
+    private static Field f = new();
     // STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
     // [System.STAThread]
     public static void Main()
     {
         Raylib.InitWindow(800, 480, "Hello World");
-        Field f = new();
-        while (!Raylib.WindowShouldClose())
-        {
-            f.Manipulator.InputProcessing();
+        Raylib.SetTargetFPS(60);
+    }
 
-            Raylib.BeginDrawing();
-            Raylib.ClearBackground(Color.White);
+    [JSExport]
+    public static void UpdateFrame()
+    {
+        f.Manipulator.InputProcessing();
 
-            f.GridDraw();
-            Raylib.EndDrawing();
-        }
+        Raylib.BeginDrawing();
+        Raylib.ClearBackground(Color.White);
 
-        Raylib.CloseWindow();
+        f.GridDraw();
+        Raylib.EndDrawing();
     }
 }
