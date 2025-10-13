@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace KnightRotateDemo;
 
 public enum Direction: byte
@@ -53,5 +55,10 @@ public static class DirectionHelper
     public static Direction RotateAnticlockwise(this Direction dir)
     {
         return (Direction)(((int)dir + 7) & 0x7);
+    }
+
+    public static Vector2 RotateClockwise(this Direction dir, float t)
+    {
+        return Vector2.One;
     }
 }
