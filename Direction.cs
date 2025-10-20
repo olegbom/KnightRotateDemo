@@ -47,6 +47,22 @@ public static class DirectionHelper
         };
     }
 
+    public static Vector2 Delta(this Direction dir)
+    {
+        return dir switch
+        {
+            Direction.One => new Vector2(1, -2),
+            Direction.Two => new Vector2(2, -1),
+            Direction.Four => new Vector2(2, 1),
+            Direction.Five => new Vector2(1, 2),
+            Direction.Seven => new Vector2(-1, 2),
+            Direction.Eight => new Vector2(-2, 1),
+            Direction.Ten => new Vector2(-2, -1),
+            Direction.Eleven => new Vector2(-1, -2),
+            _ => throw new System.NotImplementedException(),
+        };
+    }
+
     public static Direction RotateClockwise(this Direction dir)
     {
         return (Direction)(((int)dir + 1) & 0x7);
@@ -59,6 +75,6 @@ public static class DirectionHelper
 
     public static Vector2 RotateClockwise(this Direction dir, float t)
     {
-        return Vector2.One;
+        return Vector2.Zero;
     }
 }

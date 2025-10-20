@@ -1,5 +1,6 @@
 ﻿using Raylib_cs;
 using System.Runtime.InteropServices.JavaScript;
+using System.Numerics;
 
 namespace KnightRotateDemo;
 
@@ -17,12 +18,15 @@ public partial class Application
     [JSExport]
     public static void UpdateFrame()
     {
+        Gesture currentGesture = Raylib.GetGestureDetected();
+        Vector2 touchPosition = Raylib.GetTouchPosition(0);
         f.Manipulator.InputProcessing();
 
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.White);
 
         f.GridDraw();
+        if (currentGesture != Gesture.None) Raylib.DrawCircleV(touchPosition, 30, Color.Maroon);
         Raylib.EndDrawing();
     }
 }
