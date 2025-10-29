@@ -49,19 +49,19 @@ public class Manipulator
 
     public void Draw(int cellSize)
     {
-        Raylib.DrawCircleV(
-            new Vector2(
+        Vector2 c = new(
                 cellSize * (X + 0.5f),
                 cellSize * (Y + 0.5f)
-            ),
-            cellSize * 0.4f, Color.Brown);
+            );
+        Raylib.DrawCircleV(c, cellSize * 0.4f, Color.Brown);
 
         void DrawDirectionAnimation(DirectionAnimationMode mode)
         {
             double duration = Raylib.GetTime() - _directionAnimationStartTime;
-            if (duration > DiractionAnimationDuration)
+            if (duration >= DiractionAnimationDuration)
             {
                 _animationMode = DirectionAnimationMode.None;
+                DrawCircle(Direction.Delta());
             }
             else
             {
@@ -70,13 +70,7 @@ public class Manipulator
                 Vector2 delta = mode == DirectionAnimationMode.Anticlockwise
                                     ? Direction.RotateClockwise().RotateAnticlockwise(t)
                                     : Direction.RotateAnticlockwise().RotateClockwise(t);
-                Raylib.DrawCircleLinesV(
-                    new Vector2(
-                        cellSize * (X + delta.X + 0.5f),
-                        cellSize * (Y + delta.Y + 0.5f)
-                    ),
-                    cellSize * (IsGrabbed ? 0.4f : 0.45f),
-                    IsGrabbed ? Color.Blue : Color.DarkBlue);
+                DrawCircle(delta);
             }
         }
 
@@ -89,16 +83,22 @@ public class Manipulator
                 DrawDirectionAnimation(_animationMode);
                 break;
             case DirectionAnimationMode.None:
-                Raylib.DrawCircleLinesV(
-                    new Vector2(
-                        cellSize * (X + Direction.DeltaX() + 0.5f),
-                        cellSize * (Y + Direction.DeltaY() + 0.5f)
-                    ),
-                    cellSize * (IsGrabbed ? 0.4f : 0.45f),
-                    IsGrabbed ? Color.Blue : Color.DarkBlue);
+                DrawCircle(Direction.Delta());
                 break;
             default:
                 break;
+        }
+
+        void DrawCircle(Vector2 delta)
+        {
+            Vector2 m = new(
+                        cellSize * (X + delta.X + 0.5f),
+                        cellSize * (Y + delta.Y + 0.5f)
+                    );
+            Raylib.DrawCircleLinesV( m,
+                    cellSize * (2.5f - System.MathF.Sqrt(5.0f)),
+                    IsGrabbed ? Color.Blue : Color.DarkBlue);
+            Raylib.DrawLineV(m, c, Color.Blue);
         }
     }
 }
