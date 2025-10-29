@@ -16,6 +16,9 @@ public enum Direction: byte
 
 public static class DirectionHelper
 {
+    public static readonly float Alpha = System.MathF.Atan(0.5f);
+    public static readonly float Beta = System.MathF.PI * 0.25f - Alpha;
+
     public static int DeltaX(this Direction dir) {
         return dir switch
         {
@@ -75,6 +78,15 @@ public static class DirectionHelper
 
     public static Vector2 RotateClockwise(this Direction dir, float t)
     {
-        return Vector2.Zero;
+        float angle = ((int)dir % 2) == 1 ? Alpha : Beta;
+        angle *= 2*t;
+        return Vector2.Transform(dir.Delta(), Matrix3x2.CreateRotation(angle));
+    }
+
+    public static Vector2 RotateAnticlockwise(this Direction dir, float t)
+    {
+        float angle = ((int)dir % 2) == 1 ? Beta : Alpha;
+        angle *= -2*t;
+        return Vector2.Transform(dir.Delta(), Matrix3x2.CreateRotation(angle));
     }
 }

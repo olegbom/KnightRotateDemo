@@ -7,7 +7,7 @@ namespace KnightRotateDemo;
 
 public class Field
 {
-    public int Size { get; init; } = 10;
+    public int Size { get; init; } = 8;
 
     public int CellSize { get; init; } = 40;
 
@@ -20,11 +20,22 @@ public class Field
     public void GridDraw()
     {
         int max = CellSize * Size + 1;
-        for (int i = 0; i < Size + 1; i++)
+        Raylib.DrawRectangleLines(1, 0, CellSize*Size, CellSize*Size, Color.Red);
+        // for (int i = 0; i < Size + 1; i++)
+        // {
+        //     int t = CellSize * i + 1;
+        //     Raylib.DrawLine(0, t, max, t, Color.Red);
+        //     Raylib.DrawLine(t, 0, t, max, Color.Red);
+        // }
+        for(int i = 0; i < Size; i++)
         {
-            int t = CellSize * i + 1;
-            Raylib.DrawLine(0, t, max, t, Color.Red);
-            Raylib.DrawLine(t, 0, t, max, Color.Red);
+            for(int j = 0; j < Size; j++)
+            {
+                if( ((i+j)%2) == 1)
+                {
+                    Raylib.DrawRectangle(CellSize*i, CellSize*j, CellSize, CellSize, new Color(0, 0, 0, 100));
+                }
+            }
         }
 
         Manipulator.Draw(CellSize);

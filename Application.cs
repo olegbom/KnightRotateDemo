@@ -11,6 +11,7 @@ public partial class Application
     // [System.STAThread]
     public static void Main()
     {
+        Raylib.SetConfigFlags(ConfigFlags.Msaa4xHint);
         Raylib.InitWindow(800, 480, "Hello World");
         Raylib.SetTargetFPS(60);
     }
