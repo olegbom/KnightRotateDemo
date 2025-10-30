@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Raylib_cs;
 
@@ -19,6 +20,7 @@ public class Manipulator
     public bool IsGrabbed {get;set;} = false;
     private DirectionAnimationMode _animationMode = DirectionAnimationMode.None;
     private double _directionAnimationStartTime = 0;
+    private readonly Queue<DirectionAnimationMode> _delayedAnimations = [];
 
     public Manipulator()
     {
@@ -29,16 +31,35 @@ public class Manipulator
     {
         if( Raylib.IsKeyPressed(KeyboardKey.A) )
         {
-            Direction = Direction.RotateAnticlockwise();
-            _animationMode = DirectionAnimationMode.Anticlockwise;
-            _directionAnimationStartTime = Raylib.GetTime();
+            if( _animationMode == DirectionAnimationMode.None )
+            {
+                Direction = Direction.RotateAnticlockwise();
+                _animationMode = DirectionAnimationMode.Anticlockwise;
+                _directionAnimationStartTime = Raylib.GetTime();
+            }
+            else
+            {
+                _delayedAnimations.Enqueue(DirectionAnimationMode.Anticlockwise);
+            }
         }
 
         if( Raylib.IsKeyPressed(KeyboardKey.D))
         {
-            Direction = Direction.RotateClockwise();
-            _animationMode = DirectionAnimationMode.Clockwise;
-            _directionAnimationStartTime = Raylib.GetTime();
+            if(_animationMode == DirectionAnimationMode.None )
+            {
+                Direction = Direction.RotateClockwise();
+                _animationMode = DirectionAnimationMode.Clockwise;
+                _directionAnimationStartTime = Raylib.GetTime();
+            }
+            else
+            {
+                _delayedAnimations.Enqueue(DirectionAnimationMode.Clockwise);
+            }
+        }
+
+        if( Raylib.IsKeyPressed(KeyboardKey.W))
+        {
+
         }
 
         if( Raylib.IsKeyPressed(KeyboardKey.R) )
@@ -49,19 +70,38 @@ public class Manipulator
 
     public void Draw(int cellSize)
     {
+        float r = cellSize * (2.5f - System.MathF.Sqrt(5.0f));
         Vector2 c = new(
                 cellSize * (X + 0.5f),
                 cellSize * (Y + 0.5f)
             );
-        Raylib.DrawCircleV(c, cellSize * 0.4f, Color.Brown);
+        Raylib.DrawCircleV(c, cellSize * (System.MathF.Sqrt(8.0f) - 5.0f/2), Color.Red);
 
         void DrawDirectionAnimation(DirectionAnimationMode mode)
         {
             double duration = Raylib.GetTime() - _directionAnimationStartTime;
             if (duration >= DiractionAnimationDuration)
             {
-                _animationMode = DirectionAnimationMode.None;
-                DrawCircle(Direction.Delta());
+                if (_delayedAnimations.TryDequeue(out DirectionAnimationMode nextMode))
+                {
+                    _animationMode = nextMode;
+                    switch (nextMode)
+                    {
+                        case DirectionAnimationMode.Anticlockwise:
+                            Direction = Direction.RotateAnticlockwise();
+                            break;
+                        case DirectionAnimationMode.Clockwise:
+                            Direction = Direction.RotateClockwise();
+                            break;
+                    }
+                    _directionAnimationStartTime = Raylib.GetTime();
+                    DrawDirectionAnimation(nextMode);
+                }
+                else
+                {
+                    _animationMode = DirectionAnimationMode.None;
+                    DrawCircle(Direction.Delta());
+                }
             }
             else
             {
@@ -95,10 +135,8 @@ public class Manipulator
                         cellSize * (X + delta.X + 0.5f),
                         cellSize * (Y + delta.Y + 0.5f)
                     );
-            Raylib.DrawCircleLinesV( m,
-                    cellSize * (2.5f - System.MathF.Sqrt(5.0f)),
-                    IsGrabbed ? Color.Blue : Color.DarkBlue);
-            Raylib.DrawLineV(m, c, Color.Blue);
+            Raylib.DrawCircleLinesV( m, r, IsGrabbed ? Color.Blue : Color.DarkBlue);
+            Raylib.DrawLineV(c + delta*cellSize*0.2f, c + delta*cellSize*0.8f, Color.Blue);
         }
     }
 }
