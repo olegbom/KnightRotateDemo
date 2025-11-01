@@ -4,9 +4,9 @@ using Raylib_cs;
 
 namespace KnightRotateDemo;
 
-public class Manipulator
+public class Manipulator(Field field)
 {
-    public static double DiractionAnimationDuration { get;set; } = 0.3;
+    public static double DiractionAnimationDuration { get;set; } = 0.0;
 
     private enum DirectionAnimationMode
     {
@@ -14,57 +14,76 @@ public class Manipulator
         Clockwise,
         Anticlockwise,
     }
+
     public int X { get; set; }
     public int Y { get; set; }
     public Direction Direction { get; set;} = Direction.One;
-    public bool IsGrabbed {get;set;} = false;
+    public bool IsGrabbed { get; set; } = false;
+    public Field Field { get; } = field;
     private DirectionAnimationMode _animationMode = DirectionAnimationMode.None;
     private double _directionAnimationStartTime = 0;
     private readonly Queue<DirectionAnimationMode> _delayedAnimations = [];
 
-    public Manipulator()
+    public void Swap()
     {
-
+        if (_animationMode == DirectionAnimationMode.None)
+        {
+            int newX = X + Direction.DeltaX();
+            int newY = Y + Direction.DeltaY();
+            if (newX >= 0 && newX < 8 &&
+                newY >= 0 && newY < 8)
+            {
+                X = newX;
+                Y = newY;
+                Direction = (Direction)(((int)Direction + 4) % 8);
+            }
+        }
     }
 
-    public void InputProcessing()
+    public void TurnAround()
     {
-        if( Raylib.IsKeyPressed(KeyboardKey.A) )
+        if (_animationMode == DirectionAnimationMode.None)
         {
-            if( _animationMode == DirectionAnimationMode.None )
-            {
-                Direction = Direction.RotateAnticlockwise();
-                _animationMode = DirectionAnimationMode.Anticlockwise;
-                _directionAnimationStartTime = Raylib.GetTime();
-            }
-            else
-            {
-                _delayedAnimations.Enqueue(DirectionAnimationMode.Anticlockwise);
-            }
+            Direction = Direction.RotateClockwise();
+            _animationMode = DirectionAnimationMode.Clockwise;
+            _directionAnimationStartTime = Raylib.GetTime();
+        }
+        else
+        {
+            _delayedAnimations.Enqueue(DirectionAnimationMode.Clockwise);
         }
 
-        if( Raylib.IsKeyPressed(KeyboardKey.D))
+        for (int i = 0; i < 3; i++)
         {
-            if(_animationMode == DirectionAnimationMode.None )
-            {
-                Direction = Direction.RotateClockwise();
-                _animationMode = DirectionAnimationMode.Clockwise;
-                _directionAnimationStartTime = Raylib.GetTime();
-            }
-            else
-            {
-                _delayedAnimations.Enqueue(DirectionAnimationMode.Clockwise);
-            }
+            _delayedAnimations.Enqueue(DirectionAnimationMode.Clockwise);
         }
+    }
 
-        if( Raylib.IsKeyPressed(KeyboardKey.W))
+    public void RotateClockwise()
+    {
+        if (_animationMode == DirectionAnimationMode.None)
         {
-
+            Direction = Direction.RotateClockwise();
+            _animationMode = DirectionAnimationMode.Clockwise;
+            _directionAnimationStartTime = Raylib.GetTime();
         }
-
-        if( Raylib.IsKeyPressed(KeyboardKey.R) )
+        else
         {
-            IsGrabbed = !IsGrabbed;
+            _delayedAnimations.Enqueue(DirectionAnimationMode.Clockwise);
+        }
+    }
+
+    public void RotateAnticlockwise()
+    {
+        if (_animationMode == DirectionAnimationMode.None)
+        {
+            Direction = Direction.RotateAnticlockwise();
+            _animationMode = DirectionAnimationMode.Anticlockwise;
+            _directionAnimationStartTime = Raylib.GetTime();
+        }
+        else
+        {
+            _delayedAnimations.Enqueue(DirectionAnimationMode.Anticlockwise);
         }
     }
 
@@ -80,7 +99,8 @@ public class Manipulator
         void DrawDirectionAnimation(DirectionAnimationMode mode)
         {
             double duration = Raylib.GetTime() - _directionAnimationStartTime;
-            if (duration >= DiractionAnimationDuration)
+            double maxDuration = DiractionAnimationDuration / (1 + _delayedAnimations.Count);
+            if (duration >= maxDuration)
             {
                 if (_delayedAnimations.TryDequeue(out DirectionAnimationMode nextMode))
                 {
@@ -105,7 +125,7 @@ public class Manipulator
             }
             else
             {
-                float t = (float)(duration / DiractionAnimationDuration);
+                float t = (float)(duration / maxDuration);
                 t = AnimationHelper.BizzareMoving(t);
                 Vector2 delta = mode == DirectionAnimationMode.Anticlockwise
                                     ? Direction.RotateClockwise().RotateAnticlockwise(t)
@@ -131,11 +151,18 @@ public class Manipulator
 
         void DrawCircle(Vector2 delta)
         {
-            Vector2 m = new(
-                        cellSize * (X + delta.X + 0.5f),
-                        cellSize * (Y + delta.Y + 0.5f)
-                    );
-            Raylib.DrawCircleLinesV( m, r, IsGrabbed ? Color.Blue : Color.DarkBlue);
+            Vector2 m = cellSize * (new Vector2(X + 0.5f, Y + 0.5f) + delta);
+            if ( IsGrabbed )
+            {
+                for(int i = 0; i < 4; i++)
+                {
+                    Raylib.DrawRingLines(m, r + 3, r + 3.5f, 90 * i + 15, 90 * (i + 1) - 15, 7, Color.Blue);
+                }
+            }
+            else
+            {
+                Raylib.DrawCircleLinesV(m, r, Color.Blue);
+            }
             Raylib.DrawLineV(c + delta*cellSize*0.2f, c + delta*cellSize*0.8f, Color.Blue);
         }
     }

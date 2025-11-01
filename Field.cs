@@ -11,7 +11,7 @@ public class Field
 
     public Field()
     {
-        Manipulator = new Manipulator(){X = 4, Y = 4};
+        Manipulator = new Manipulator(this){X = 4, Y = 4};
     }
 
     public void GridDraw()
